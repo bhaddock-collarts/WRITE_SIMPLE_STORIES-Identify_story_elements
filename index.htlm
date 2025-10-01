@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Elements Interactive Activity</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 30px;
+        }
+
+        h1 {
+            color: #764ba2;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            text-align: center;
+        }
+
+        .story-box {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #333;
+        }
+
+        .story-title {
+            font-weight: bold;
+            color: #764ba2;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .question-container {
+            margin: 25px 0;
+            padding: 20px;
+            background: #f0f4ff;
+            border-radius: 12px;
+            transition: transform 0.2s;
+        }
+
+        .question-container:hover {
+            transform: translateX(5px);
+        }
+
+        .question-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+            display: block;
+        }
+
+        .answer-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+
+        .answer-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .feedback {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: 500;
+            display: none;
+        }
+
+        .feedback.correct {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .feedback.partial {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+            display: block;
+        }
+
+        .feedback.incorrect {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 14px 28px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .submit-btn {
+            background: #667eea;
+            color: white;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .reset-btn {
+            background: #6c757d;
+            color: white;
+        }
+
+        .reset-btn:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+
+        .score-display {
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #764ba2;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .instructions {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #0066cc;
+        }
+
+        .instructions p {
+            margin: 5px 0;
+            color: #333;
+        }
+
+        /* Accessibility improvements */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0,0,0,0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+
+        /* Focus visible for keyboard navigation */
+        *:focus-visible {
+            outline: 3px solid #667eea;
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" role="main">
+        <h1>Interactive Activity: Identify the Story Elements</h1>
+        
+        <div class="instructions" role="region" aria-label="Instructions">
+            <p><strong>Instructions:</strong> Read the story below carefully, then answer the questions about its key elements. Type your answers in the text boxes provided.</p>
+        </div>
+
+        <div class="story-box" role="article" aria-label="Story to analyze">
+            <div class="story-title">The Story:</div>
+            <p><em>"Maya had always been afraid of heights. When her cat Whiskers climbed to the top of the old oak tree and wouldn't come down, Maya faced a choice. Twenty minutes later, shakily descending with Whiskers in her arms, Maya realized something had changed inside her."</em></p>
+        </div>
+
+        <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Progress">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <form id="storyForm" aria-label="Story elements questions">
+            <div class="question-container">
+                <label class="question-label" for="q1">
+                    1. Who is the main character?
+                </label>
+                <input 
+                    type="text" 
+                    id="q1" 
+                    class="answer-input" 
+                    aria-describedby="feedback1"
+                    placeholder="Type your answer here..."
+                    autocomplete="off"
+                >
+                <div id="feedback1" class="feedback" role="alert"></div>
+            </div>
+
+            <div class="question-container">
+                <label class="question-label" for="q2">
+                    2. What is the setting?
+                </label>
+                <input 
+                    type="text" 
+                    id="q2" 
+                    class="answer-input" 
+                    aria-describedby="feedback2"
+                    placeholder="Type your answer here..."
+                    autocomplete="off"
+                >
+                <div id="feedback2" class="feedback" role="alert"></div>
+            </div>
+
+            <div class="question-container">
+                <label class="question-label" for="q3">
+                    3. What is the central problem (plot)?
+                </label>
+                <input 
+                    type="text" 
+                    id="q3" 
+                    class="answer-input" 
+                    aria-describedby="feedback3"
+                    placeholder="Type your answer here..."
+                    autocomplete="off"
+                >
+                <div id="feedback3" class="feedback" role="alert"></div>
+            </div>
+
+            <div class="question-container">
+                <label class="question-label" for="q4">
+                    4. What is the resolution?
+                </label>
+                <input 
+                    type="text" 
+                    id="q4" 
+                    class="answer-input" 
+                    aria-describedby="feedback4"
+                    placeholder="Type your answer here..."
+                    autocomplete="off"
+                >
+                <div id="feedback4" class="feedback" role="alert"></div>
+            </div>
+
+            <div class="question-container">
+                <label class="question-label" for="q5">
+                    5. What theme or message might this story convey?
+                </label>
+                <input 
+                    type="text" 
+                    id="q5" 
+                    class="answer-input" 
+                    aria-describedby="feedback5"
+                    placeholder="Type your answer here..."
+                    autocomplete="off"
+                >
+                <div id="feedback5" class="feedback" role="alert"></div>
+            </div>
+        </form>
+
+        <div class="score-display" id="scoreDisplay" role="status" aria-live="polite"></div>
+
+        <div class="button-group">
+            <button type="button" class="submit-btn" id="submitBtn" aria-label="Check your answers">
+                Check Answers
+            </button>
+            <button type="button" class="reset-btn" id="resetBtn" aria-label="Reset and try again">
+                Reset
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const answers = {
+            q1: ['maya'],
+            q2: ['oak tree', 'tree', 'outside', 'outdoors', 'old oak tree'],
+            q3: ['cat stuck', 'whiskers stuck', 'cat in tree', 'rescue cat', 'get cat down', 'cat climbed', 'afraid of heights'],
+            q4: ['maya rescued', 'descended with whiskers', 'got cat down', 'climbed down', 'saved the cat', 'changed inside'],
+            q5: ['overcoming fear', 'facing fears', 'courage', 'bravery', 'love conquers fear', 'growth', 'personal growth', 'change', 'transformation']
+        };
+
+        const submitBtn = document.getElementById('submitBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const progressFill = document.getElementById('progressFill');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+
+        function normalizeText(text) {
+            return text.toLowerCase().trim().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, '');
+        }
+
+        function checkAnswer(questionId, userAnswer) {
+            const normalized = normalizeText(userAnswer);
+            const possibleAnswers = answers[questionId];
+            
+            for (let correct of possibleAnswers) {
+                if (normalized.includes(normalizeText(correct)) || normalizeText(correct).includes(normalized)) {
+                    return 'correct';
+                }
+            }
+            
+            if (normalized.length > 3) {
+                return 'partial';
+            }
+            
+            return 'incorrect';
+        }
+
+        function updateProgress() {
+            let answered = 0;
+            for (let i = 1; i <= 5; i++) {
+                const input = document.getElementById(`q${i}`);
+                if (input.value.trim() !== '') {
+                    answered++;
+                }
+            }
+            const percentage = (answered / 5) * 100;
+            progressFill.style.width = percentage + '%';
+            progressFill.parentElement.setAttribute('aria-valuenow', percentage);
+        }
+
+        // Add input listeners for progress bar
+        for (let i = 1; i <= 5; i++) {
+            document.getElementById(`q${i}`).addEventListener('input', updateProgress);
+        }
+
+        submitBtn.addEventListener('click', function() {
+            let correctCount = 0;
+            let allAnswered = true;
+
+            for (let i = 1; i <= 5; i++) {
+                const input = document.getElementById(`q${i}`);
+                const feedback = document.getElementById(`feedback${i}`);
+                const answer = input.value.trim();
+
+                if (answer === '') {
+                    allAnswered = false;
+                    feedback.className = 'feedback incorrect';
+                    feedback.textContent = 'Please provide an answer.';
+                    continue;
+                }
+
+                const result = checkAnswer(`q${i}`, answer);
+                
+                feedback.className = `feedback ${result}`;
+                
+                if (result === 'correct') {
+                    feedback.textContent = '✓ Correct! Well done.';
+                    correctCount++;
+                } else if (result === 'partial') {
+                    feedback.textContent = '~ You\'re on the right track! Consider being more specific or think about the key element being asked.';
+                } else {
+                    feedback.textContent = '✗ Not quite. Review the story and try to identify this specific element.';
+                }
+            }
+
+            if (allAnswered) {
+                scoreDisplay.style.display = 'block';
+                scoreDisplay.textContent = `Score: ${correctCount} out of 5 correct`;
+                
+                if (correctCount === 5) {
+                    scoreDisplay.textContent += ' 🎉 Excellent work!';
+                } else if (correctCount >= 3) {
+                    scoreDisplay.textContent += ' 👍 Good effort!';
+                } else {
+                    scoreDisplay.textContent += ' Keep practicing!';
+                }
+            }
+
+            submitBtn.disabled = true;
+            setTimeout(() => { submitBtn.disabled = false; }, 1000);
+        });
+
+        resetBtn.addEventListener('click', function() {
+            document.getElementById('storyForm').reset();
+            
+            for (let i = 1; i <= 5; i++) {
+                const feedback = document.getElementById(`feedback${i}`);
+                feedback.className = 'feedback';
+                feedback.textContent = '';
+            }
+            
+            scoreDisplay.style.display = 'none';
+            progressFill.style.width = '0%';
+            progressFill.parentElement.setAttribute('aria-valuenow', 0);
+            
+            document.getElementById('q1').focus();
+        });
+
+        // Keyboard accessibility: Submit on Ctrl+Enter
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                submitBtn.click();
+            }
+        });
+    </script>
+</body>
+</html>
